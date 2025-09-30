@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: annuerp-backend
+    env: docker
+    region: frankfurt  # or your preferred region
+    plan: free
+    branch: main
+    dockerfilePath: backend/Dockerfile
+    envVars:
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_ANON_KEY
+        sync: false
+      - key: SUPABASE_SERVICE_ROLE_KEY
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: FRONTEND_URL
+        value: https://your-frontend-url.vercel.app

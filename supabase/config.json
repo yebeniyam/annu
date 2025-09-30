@@ -1,0 +1,15 @@
+{
+  "projectId": "annu-erp",
+  "version": "1.0.0",
+  "functions": {},
+  "database": {
+    "extensions": [
+      {
+        "name": "uuid-ossp",
+        "schema": "pg_catalog",
+        "version": "1.0"
+      }
+    ],
+    "version": "12.0"
+  }
+}

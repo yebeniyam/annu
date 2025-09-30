@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "framework": "create-react-app",
+  "functions": {
+    "api/**/*": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  },
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "dist/$1",
+      "status": 200
+    }
+  ],
+  "env": {
+    "REACT_APP_SUPABASE_URL": "your_supabase_project_url",
+    "REACT_APP_SUPABASE_ANON_KEY": "your_supabase_anon_key"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "inventory": [
+    { "id": 1, "name": "Tomatoes", "unit": "kg", "category": "Produce", "department": "Kitchen", "quantity": 10, "cost": 2.5 },
+    { "id": 2, "name": "Milk", "unit": "gallon", "category": "Dairy", "department": "Kitchen", "quantity": 5, "cost": 4 },
+    { "id": 3, "name": "Bread", "unit": "loaf", "category": "Bakery", "department": "Kitchen", "quantity": 20, "cost": 2 },
+    { "id": 4, "name": "Napkins", "unit": "pack", "category": "Non-Food", "department": "Front of House", "quantity": 50, "cost": 5 }
+  ],
+  "purchaseOrders": [
+    { "id": 1, "supplier": "Supplier A", "expectedDate": "2025-09-30", "status": "Ordered", "items": [{ "name": "Tomatoes", "quantity": "10" }] },
+    { "id": 2, "supplier": "Supplier B", "expectedDate": "2025-10-05", "status": "Received", "items": [{ "name": "Milk", "quantity": "5" }] },
+    { "id": 3, "supplier": "Supplier C", "expectedDate": "2025-10-10", "status": "Partial", "items": [{ "name": "Bread", "quantity": "10" }] }
+  ],
+  "users": [
+    { "id": 1, "name": "John Doe", "email": "john.doe@example.com", "role": "Manager", "password": "password" },
+    { "id": 2, "name": "Jane Smith", "email": "jane.smith@example.com", "role": "Chef", "password": "password" },
+    { "id": 3, "name": "Peter Jones", "email": "peter.jones@example.com", "role": "Bartender", "password": "password" }
+  ],
+  "sales": [
+      { "id": 1, "foodSales": 1200, "beverageSales": 800, "totalSales": 2000, "date": "2025-09-23" }
+  ],
+  "counts": [
+      { "id": 1, "itemId": 1, "counted": 8, "date": "2025-09-23" },
+      { "id": 2, "itemId": 2, "counted": 5, "date": "2025-09-23" }
+  ],
+  "waste": [
+      { "id": 1, "itemId": 1, "quantity": 2, "reason": "Spoilage", "date": "2025-09-23" }
+  ],
+  "priceChanges": [
+      { "id": 1, "itemId": 1, "oldPrice": 2.0, "newPrice": 2.5, "date": "2025-09-20" },
+      { "id": 2, "itemId": 2, "oldPrice": 3.5, "newPrice": 4.0, "date": "2025-09-21" }
+  ],
+  "recipes": [
+      { "id": 1, "name": "Tomato Soup", "sellingPrice": 10.0, "ingredients": [{ "itemId": 1, "quantity": 0.5 }] },
+      { "id": 2, "name": "Milkshake", "sellingPrice": 5.0, "ingredients": [{ "itemId": 2, "quantity": 0.25 }] }
+  ],
+  "departments": [
+      { "id": 1, "name": "Kitchen" },
+      { "id": 2, "name": "Bar" },
+      { "id": 3, "name": "Hot Beverage" },
+      { "id": 4, "name": "Storage" }
+  ],
+  "categories": [
+      { "id": 1, "name": "Dry Goods" },
+      { "id": 2, "name": "Fresh Produce" },
+      { "id": 3, "name": "Meat" },
+      { "id": 4, "name": "Dairy" },
+      { "id": 5, "name": "Spirits" },
+      { "id": 6, "name": "Wine" },
+      { "id": 7, "name": "Beer" },
+      { "id": 8, "name": "Mixers" },
+      { "id": 9, "name": "Coffee" },
+      { "id": 10, "name": "Tea" },
+      { "id": 11, "name": "Syrups" },
+      { "id": 12, "name": "Non-Food" }
+  ]
+}

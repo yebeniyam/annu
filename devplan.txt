@@ -1,0 +1,370 @@
+Annu F&B Cost Controlling App
+✅ Multi-department issuing (Kitchen, Bar, Hot Beverage)  
+✅ Controller role with daily & monthly counts  
+✅ Non-food items (napkins, cleaning, etc.)  
+✅ Manager-level configuration of **departments, categories, and users**  
+✅ XLS import/export at all key stages  
+✅ cPanel deployment support  
+✅ Ingredient cost tracking via receiving and price change history  
+✅ Accurate cost % calculation with sales input  
+
+This specification is **ready for development, stakeholder review, or investor pitching**.
+
+---
+
+# 🍽️ **F&B Cost Controlling App – Final Integrated Specification**
+
+---
+
+## 1. **Overview**
+A comprehensive web and mobile application designed to help restaurants, cafes, bars, and catering businesses **track, analyze, and optimize food, beverage, and operational costs** across the full F&B lifecycle.
+
+The app supports:
+- **Departmental inventory issuing** (Kitchen, Bar, Hot Beverage)
+- **Controller-led daily spot checks and monthly full counts**
+- **Tracking of non-food consumables** (napkins, gloves, cleaning supplies)
+- **Manager-level configuration** of departments, categories, and users
+- **Manual and bulk data entry** via XLS/CSV
+- **Accurate food, beverage, and overhead cost %** using real sales and usage data
+- **cPanel-compatible deployment** for affordable hosting
+
+Built for real-world operations, the app mirrors the complete **F&B cycle**:  
+**Ordering → Purchasing → Receiving → Storing → Issuing → Sales → Reporting**
+
+---
+
+## 2. **Core Operational Cycle**
+
+| Stage | Module | Responsible Role |
+|------|--------|------------------|
+| 1. Ordering | Purchase Orders | Purchaser |
+| 2. Purchasing | PO Management | Manager |
+| 3. Receiving | Receiving Log | Receiver |
+| 4. Storing | Inventory Management | Storekeeper |
+| 5. Issuing | Kitchen, Bar, Hot Beverage | Chef, Bartender, Barista |
+| 6. Preparation | Recipe & Menu Costing | Kitchen/Bar Teams |
+| 7. Sales | Sales Input | Manager |
+| 8. Stock Control | Daily & Monthly Counts | **Controller** |
+| 9. Reporting | Cost %, COGS, Waste | Manager/Owner |
+
+---
+
+## 3. **Key Features**
+
+### 3.1 **Inventory Management**
+- Track items by:
+  - Name, Unit (kg, L, each, pack), Category, Department
+  - Current cost, supplier, par level, reorder point
+- Supports **non-food items** (e.g., napkins, cleaning supplies, gas)
+- **XLS import/export** with validation and templates
+- **Cost history** for each item (see Section 6)
+
+---
+
+### 3.2 **Departments (Manager-Created)**
+Managers can **create, edit, and deactivate** departments for issuing and reporting.
+
+#### Default Departments:
+- Kitchen
+- Bar
+- Hot Beverage
+- Storage
+
+#### Manager Actions:
+- Add new (e.g., “Pastry Station”, “Smoothie Bar”)
+- Rename or deactivate
+- Assign users to departments
+
+> Used in: Issue forms, reports, permissions
+
+---
+
+### 3.3 **Categories (Manager-Created)**
+Managers can **customize inventory categories** for better organization and reporting.
+
+#### Default Categories:
+| Type | Examples |
+|------|---------|
+| **Food** | Dry Goods, Fresh Produce, Meat, Dairy |
+| **Beverage** | Spirits, Wine, Beer, Mixers |
+| **Hot Beverage** | Coffee, Tea, Syrups, Milk |
+| **Non-Food** | Napkins, Gloves, Cleaning, Packaging, Gas |
+
+#### Manager Actions:
+- Add, rename, or deactivate categories
+- Assign type (Food/Beverage/Non-Food)
+- Bulk-reassign items during reorganization
+
+> Used in: Inventory list, reports, XLS import validation
+
+---
+
+### 3.4 **User Management (Manager-ControlLED)**
+Managers can **invite, assign, and manage team members** without Owner intervention.
+
+#### Roles:
+| Role | Permissions |
+|------|------------|
+| **Owner** | Full access, billing, audit logs |
+| **Manager** | Configure depts/cats/users, POs, sales, reports |
+| **Chef** | Kitchen inventory, issue to kitchen |
+| **Bartender** | Bar inventory, issue items to bar |
+| **Barista** | Hot Beverage inventory, issue items |
+| **Purchaser** | Create POs, manage suppliers |
+| **Controller** | Perform counts, adjust inventory, view variance |
+| **Staff (View-Only)** | View reports only |
+
+#### Manager Actions:
+- Invite users via email
+- Assign role and department(s)
+- Edit or deactivate users
+- Reset passwords
+- Audit log: who invited whom and when
+
+---
+
+### 3.5 **Purchase Orders (POs)**
+- Create POs with expected cost, quantity, supplier
+- Track status: *Ordered*, *Received*, *Partial*
+- **XLS import** of POs (template provided)
+- Compare **expected vs actual cost** on receiving
+
+---
+
+### 3.6 **Receiving Module**
+- Log received items with **actual cost and quantity**
+- Automatically **update current ingredient cost**
+- Flag **price/quantity variances** vs PO
+- Record vendor, date, and receiving user
+- **XLS import** of receiving data
+
+> ✅ **Primary source of cost updates**
+
+---
+
+### 3.7 **Issuing to Departments**
+Users issue inventory to specific departments:
+
+#### 🍽️ **Kitchen Issue**
+- Chef issues items for prep/cooking
+- Reduces inventory, tracks usage
+
+#### 🍸 **Bar Issue**
+- Bartender issues alcohol, mixers, garnishes
+- Supports batch or per-drink issuing
+- Tracks over-pour risk (future)
+
+#### ☕ **Hot Beverage Issue**
+- Barista issues coffee, tea, milk, syrups, cups
+- Can link to recipes (e.g., “Latte”)
+- Reduces inventory in “Hot Beverage” category
+
+#### 🧻 **Non-Food Issue**
+- Issue napkins, gloves, cleaning supplies
+- Cost attributed to **operational overhead**
+
+> All issues reduce inventory and are logged with user, date, purpose
+
+---
+
+### 3.8 **Controller – Stock Count Management**
+A dedicated **Controller** performs:
+- **Daily Spot Checks**:
+  - Quick counts on high-value items (e.g., whiskey, coffee, prime cuts)
+  - Compare to system → flag discrepancies
+- **Monthly Full Inventory Counts**:
+  - Physical count of all stored items
+  - Enter counts → system calculates **variance**
+  - Auto-generates **adjustment entries** for shrinkage
+
+#### Features:
+- **Count Sheets (XLS Download)**:
+  - Pre-filled with expected quantities
+  - Columns: Item, Expected, Counted, Variance, Notes
+- **Mobile Count Mode**:
+  - Offline-friendly interface
+  - Search or scan items, enter count
+- **Variance Reporting**:
+  - Highlight losses >5%
+  - Categorize: spoilage, spill, theft
+- **Adjustment Logging**:
+  - Auto-create inventory adjustment
+  - Updates **closing inventory** for COGS
+
+> 🔐 Only Controller and Admin can perform full counts
+
+---
+
+### 3.9 **Sales Input**
+- **Manual entry**: Daily form for:
+  - Food Sales
+  - Beverage Sales (Bar, Hot Beverage)
+  - Total Sales
+- **XLS/CSV import** of weekly sales data
+- Template download with validation
+- Used to calculate **cost % by department**
+
+---
+
+### 3.10 **Cost Calculation Engine**
+- **COGS** = (Opening Inv + Purchases – Closing Inv)
+- **Food Cost %** = (Kitchen COGS / Food Sales) × 100
+- **Bar Cost %** = (Bar COGS / Bar Sales) × 100
+- **Hot Beverage Cost %** = (HB COGS / HB Sales) × 100
+- **Operational Cost %** = (Non-Food COGS / Total Sales) × 100
+- Uses **FIFO** or **weighted average** costing (configurable)
+
+---
+
+### 3.11 **Reporting & Export**
+#### Reports:
+- Departmental Cost Summary
+- Non-Food Consumables Report
+- Controller Count Variance Report
+- Waste & Shrinkage by Category
+- Price Change & Variance Alerts
+- Recipe Cost vs. Selling Price
+
+#### Export:
+- All reports exportable to **XLS, CSV, PDF**
+- XLS templates available for all imports
+
+---
+
+### 3.12 **XLS/CSV Import Framework**
+| Module | Importable? | Template Available |
+|-------|-------------|--------------------|
+| Inventory | ✅ | ✅ |
+| Purchase Orders | ✅ | ✅ |
+| Receiving Data | ✅ | ✅ |
+| Recipes | ✅ | ✅ |
+| Waste Logs | ✅ | ✅ |
+| Sales Data | ✅ | ✅ |
+| Issue Logs | ✅ | ✅ |
+| Count Sheets | ✅ | ✅ |
+
+> Features:
+> - Drag-and-drop upload
+> - Preview before import
+> - Validation with error highlighting
+> - Import history log
+
+---
+
+## 4. **How Ingredient Costs Are Sourced**
+
+| Source | When Used | Accuracy | Notes |
+|-------|-----------|---------|-------|
+| **Receiving (Actual Cost)** | When goods are received | ✅ Highest | Primary source; updates current cost |
+| **Manual Edit** | Ad-hoc updates | ⚠️ Medium | For corrections |
+| **XLS Import** | Bulk updates | ✅ High | Weekly price lists |
+| **PO (Expected Cost)** | Forecast only | ❌ Not final | For variance tracking |
+
+> 💡 **Golden Rule**: Cost changes are **triggered by receiving events**.
+
+---
+
+## 5. **Handling Price Changes**
+
+- **Cost History** maintained for each ingredient
+- Logs: date, old cost, new cost, variance, source, user
+- **FIFO** or **weighted average** for COGS
+- **Price trend charts** and **variance alerts** in UI
+- Recipe costs auto-update when ingredient prices change
+
+---
+
+## 6. **Technical Specification**
+
+### 6.1 **Tech Stack**
+| Layer | Technology |
+|------|------------|
+| Frontend | React (Web), React Native (Mobile) |
+| Backend | Node.js + Express (or PHP if Node not supported) |
+| Database | MySQL (cPanel-compatible) |
+| File Processing | SheetJS (`xlsx`) |
+| Hosting | cPanel (VPS or managed Linux) |
+| Auth | JWT or Firebase Auth |
+| Offline | Mobile app with local storage + sync |
+
+### 6.2 **cPanel Deployment**
+- Node.js Selector enabled (if using Node)
+- MySQL database and user
+- Cron jobs for:
+  - Daily: COGS calc, count reminders
+  - Monthly: Count sheet generation
+- SSL via Let’s Encrypt
+- Secure file storage (outside `public_html`)
+
+---
+
+## 7. **Data Flow**
+
+```mermaid
+graph TD
+    A[Receiving] --> B(Inventory)
+    B --> C[Kitchen Issue]
+    B --> D[Bar Issue]
+    B --> E[Hot Beverage Issue]
+    B --> F[Non-Food Issue]
+    C --> G[Food COGS]
+    D --> H[Bar COGS]
+    E --> I[Hot Beverage COGS]
+    F --> J[Operational Cost]
+    K[Sales Input] --> L[Cost % Engine]
+    G & H & I --> L
+    J --> M[Overhead Report]
+    N[Controller Count] --> O[Adjust Inventory]
+    O --> G & H & I & J
+    L --> P[Dashboard & Reports]
+    Q[Manager Config] --> R[Depts/Cats/Users]
+    R --> C & D & E & F & P
+```
+
+---
+
+## 8. **Security & Compliance**
+- Role-based access control
+- Audit logs for user, cost, and inventory changes
+- HTTPS enforced
+- File uploads secured
+- GDPR-ready: data export/deletion tools
+
+---
+
+## 9. **Success Metrics**
+| KPI | Target |
+|-----|--------|
+| User Retention (90-day) | > 60% |
+| Avg. Time Saved/Week | > 5 hours |
+| Reduction in Food Cost % | 5–15% within 3 months |
+| XLS Import Usage Rate | > 70% |
+| App Rating | ≥ 4.5 stars |
+
+---
+
+## 10. **Deliverables**
+- Web app (React)
+- Mobile app (iOS & Android, React Native)
+- Admin panel (Manager controls)
+- XLS import/export for all modules
+- Cost % engine with departmental tracking
+- Controller count tools
+- User guide, API docs, deployment manual
+
+---
+
+## 11. **Appendices**
+
+### A. **XLS Template Columns**
+| Module | Key Columns |
+|-------|------------|
+| **Inventory** | Item, Unit, Category, Department, Cost, Par Level |
+| **Issue** | Date, Item, Qty, Department, Issued By, Purpose |
+| **Sales** | Date, Food Sales, Bar Sales, HB Sales, Total |
+| **Count Sheet** | Item, Expected, Counted, Variance, Notes, Counted By |
+
+### B. **Costing Methods**
+- **FIFO**: Recommended for accuracy
+- **Weighted Average**: Smoother for volatile prices
+- Configurable in Settings (Manager+)
