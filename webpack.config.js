@@ -2,17 +2,25 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 
-// Environment configuration
-const envKeys = {
-  'process.env.NODE_ENV': JSON.stringify('production'),
-  'process.env.API_URL': JSON.stringify(process.env.REACT_APP_API_URL || 'http://localhost:5000')
-};
-
 module.exports = (env, argv) => {
   const isProduction = argv.mode === 'production';
   
   return {
     target: 'web',
+    resolve: {
+      extensions: ['.js', '.jsx'],
+      fallback: {
+        'process/browser': require.resolve('process/browser'),
+        'stream': require.resolve('stream-browserify'),
+        'util': require.resolve('util/'),
+        'buffer': require.resolve('buffer/')
+      },
+      alias: {
+        '@components': path.resolve(__dirname, 'src/components/'),
+        '@services': path.resolve(__dirname, 'src/services/'),
+        '@utils': path.resolve(__dirname, 'src/utils/')
+      }
+    },
     entry: './src/index.js',
     output: {
       path: path.resolve(__dirname, 'dist'),
@@ -91,40 +99,35 @@ module.exports = (env, argv) => {
         }
       ]
     },
-    resolve: {
-      extensions: ['.js', '.jsx'],
-      alias: {
-        '@components': path.resolve(__dirname, 'src/components/'),
-        '@pages': path.resolve(__dirname, 'src/pages/'),
-        '@services': path.resolve(__dirname, 'src/services/'),
-        '@utils': path.resolve(__dirname, 'src/utils/')
-      }
-    },
     plugins: [
-      new webpack.HotModuleReplacementPlugin(),
-      new HtmlWebpackPlugin({
-        template: './public/index.html',
-        favicon: './public/favicon.ico'
-      }),
-      new webpack.DefinePlugin(envKeys),
       new webpack.ProvidePlugin({
         process: 'process/browser',
-      })
-    ],
-    devtool: isProduction ? 'source-map' : 'eval-source-map',
-    devServer: {
-      static: {
-        directory: path.join(__dirname, 'public'),
-      },
-      historyApiFallback: true,
-      port: 3000,
-      hot: true,
-      proxy: {
-        '/api': {
-          target: 'http://localhost:5000',
-          secure: false
+        Buffer: ['buffer', 'Buffer']
+      }),
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify(isProduction ? 'production' : 'development'),
+          REACT_APP_SUPABASE_URL: JSON.stringify(process.env.REACT_APP_SUPABASE_URL || ''),
+          REACT_APP_SUPABASE_ANON_KEY: JSON.stringify(process.env.REACT_APP_SUPABASE_ANON_KEY || ''),
+          REACT_APP_API_URL: JSON.stringify(process.env.REACT_APP_API_URL || 'http://localhost:5000')
         }
-      }
-    }
+      }),
+      new HtmlWebpackPlugin({
+        template: './public/index.html',
+        favicon: './public/favicon.ico',
+        minify: isProduction ? {
+          removeComments: true,
+          collapseWhitespace: true,
+          removeRedundantAttributes: true,
+          useShortDoctype: true,
+          removeEmptyAttributes: true,
+          removeStyleLinkTypeAttributes: true,
+          keepClosingSlash: true,
+          minifyJS: true,
+          minifyCSS: true,
+          minifyURLs: true,
+        } : undefined,
+      })
+    ]
   };
 };

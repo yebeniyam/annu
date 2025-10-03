@@ -1,5 +1,11 @@
 import { createClient } from '@supabase/supabase-js';
 
+// Handle process/browser polyfill for Vercel
+if (typeof window !== 'undefined') {
+  window.process = window.process || { env: {} };
+  window.process.browser = true;
+}
+
 // Create a single supabase client for use throughout the application
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
 const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;

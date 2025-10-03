@@ -3,6 +3,36 @@ import { supabase } from './supabaseClient';
 // Supabase-based API functions
 
 // Auth API
+export const verifyEmail = async (token) => {
+  try {
+    const { data, error } = await supabase.auth.verifyOtp({
+      token_hash: token,
+      type: 'email',
+    });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error('Email verification error:', error);
+    throw error;
+  }
+};
+
+export const resendVerificationEmail = async (email) => {
+  try {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+    });
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error('Resend verification email error:', error);
+    throw error;
+  }
+};
+
 export const login = async (email, password) => {
   try {
     const { data, error } = await supabase.auth.signInWithPassword({
