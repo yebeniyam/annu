@@ -50,23 +50,60 @@ export const AuthProvider = ({ children }) => {
   // Set up auth state change listener
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event) => {
-        console.log('Auth state changed:', event);
-        if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION') {
-          await updateAuthState();
-        } else if (event === 'SIGNED_OUT') {
-          setAuthState({
-            isAuthenticated: false,
-            user: null,
-            loading: false,
-          });
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user);
+        
+        switch (event) {
+          case 'INITIAL_SESSION':
+          case 'SIGNED_IN':
+          case 'TOKEN_REFRESHED':
+            await updateAuthState();
+            break;
+            
+          case 'SIGNED_OUT':
+            // Clear any stored session data
+            window.localStorage.removeItem('supabase.auth.token');
+            setAuthState({
+              isAuthenticated: false,
+              user: null,
+              loading: false,
+            });
+            break;
+            
+          case 'USER_UPDATED':
+            // Update user data if needed
+            if (session?.user) {
+              setAuthState(prev => ({
+                ...prev,
+                user: { ...prev.user, ...session.user }
+              }));
+            }
+            break;
+            
+          default:
+            console.log('Unhandled auth event:', event);
         }
       }
     );
 
+    // Initial check for existing session
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        await updateAuthState();
+      } else {
+        setAuthState(prev => ({
+          ...prev,
+          loading: false
+        }));
+      }
+    };
+    
+    checkSession();
+
     // Cleanup subscription on unmount
     return () => {
-      if (subscription) {
+      if (subscription?.unsubscribe) {
         subscription.unsubscribe();
       }
     };
