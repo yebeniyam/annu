@@ -30,31 +30,58 @@ export const getCurrentUser = async () => {
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     
     if (sessionError || !session) {
-      console.error('No active session:', sessionError);
+      console.log('No active session:', sessionError?.message || 'No session found');
       return null;
     }
 
-    // Then get the user data
+    // Then get the user data from auth
     const { data: { user }, error: userError } = await supabase.auth.getUser(session.access_token);
     
     if (userError || !user) {
-      console.error('Error getting user:', userError);
+      console.error('Error getting auth user:', userError?.message || 'No user found');
       return null;
     }
 
-    // Get additional user data from your users table
-    const { data: userData, error: userDataError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', user.id)
-      .single();
+    // Initialize user data with auth data
+    let userData = { ...user };
 
-    if (userDataError) {
-      console.error('Error fetching user data:', userDataError);
-      return { ...user };
+    try {
+      // Try to get additional user data from the users table
+      const { data: userProfile, error: profileError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (!profileError && userProfile) {
+        // If we have additional user data, merge it with auth data
+        userData = { ...userData, ...userProfile };
+      } else {
+        // If no user data found, create a basic profile
+        console.log('No user profile found, creating one...');
+        const { data: newUser, error: createError } = await supabase
+          .from('users')
+          .insert([
+            {
+              id: user.id,
+              email: user.email,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }
+          ])
+          .select()
+          .single();
+
+        if (!createError && newUser) {
+          userData = { ...userData, ...newUser };
+        }
+      }
+    } catch (error) {
+      console.error('Error in user profile handling:', error);
+      // Continue with just the auth data if there's an error
     }
 
-    return { ...user, ...userData };
+    return userData;
   } catch (error) {
     console.error('Error in getCurrentUser:', error);
     return null;
