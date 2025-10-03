@@ -14,30 +14,58 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     persistSession: true,
     autoRefreshToken: true,
     detectSessionInUrl: true,
-    storage: typeof window !== 'undefined' ? window.localStorage : {
-      getItem: () => null,
-      setItem: () => {},
-      removeItem: () => {}
+    storage: {
+      getItem: (key) => {
+        if (typeof window === 'undefined') return null;
+        return window.localStorage.getItem(key);
+      },
+      setItem: (key, value) => {
+        if (typeof window === 'undefined') return;
+        window.localStorage.setItem(key, value);
+      },
+      removeItem: (key) => {
+        if (typeof window === 'undefined') return;
+        window.localStorage.removeItem(key);
+      }
     }
   }
 });
 
-// Log auth state changes for debugging
-let authSubscription;
+// Initialize auth state
+const initializeAuth = async () => {
+  if (typeof window === 'undefined') return;
 
+  try {
+    // Get the current session
+    const { data: { session } } = await supabase.auth.getSession();
+    console.log('Initial session:', session);
+
+    // Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log(`Auth state changed: ${event}`, session?.user);
+        
+        // Handle specific auth events
+        if (event === 'SIGNED_OUT') {
+          window.localStorage.removeItem('supabase.auth.token');
+        }
+      }
+    );
+
+    // Cleanup on unmount
+    return () => {
+      if (subscription) {
+        subscription.unsubscribe();
+      }
+    };
+  } catch (error) {
+    console.error('Error initializing auth:', error);
+  }
+};
+
+// Initialize auth when running in browser
 if (typeof window !== 'undefined') {
-  const { data } = supabase.auth.onAuthStateChange((event, session) => {
-    console.log(`Supabase auth event: ${event}`, session?.user);
-  });
-  
-  authSubscription = data?.subscription;
-  
-  // Cleanup subscription on unmount
-  window.addEventListener('beforeunload', () => {
-    if (authSubscription) {
-      authSubscription.unsubscribe();
-    }
-  });
+  initializeAuth();
 }
 
 export default supabase;
