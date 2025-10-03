@@ -6,7 +6,13 @@ services:
     plan: free
     branch: main
     dockerfilePath: backend/Dockerfile
+    buildCommand: cd backend && npm install
+    startCommand: node server.js
     envVars:
+      - key: PORT
+        value: 10000
+      - key: NODE_ENV
+        value: production
       - key: SUPABASE_URL
         sync: false
       - key: SUPABASE_ANON_KEY
@@ -16,4 +22,4 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: FRONTEND_URL
-        value: https://your-frontend-url.vercel.app
+        value: https://annu-erp.vercel.app  # Update this with your actual frontend URL

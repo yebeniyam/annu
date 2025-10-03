@@ -489,6 +489,6 @@ app.use('*', (req, res) => {
   res.status(404).json({ error: 'Route not found' });
 });
 
-app.listen(port, () => {
+app.listen(port, '0.0.0.0', () => {
   console.log(`Annu ERP Backend server is running on port ${port}`);
 });

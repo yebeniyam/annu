@@ -1,19 +1,18 @@
 {
   "version": 2,
-  "framework": "create-react-app",
   "builds": [
     {
       "src": "package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "build"
+        "distDir": "dist"
       }
     }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "dist/$1",
+      "dest": "/$1",
       "status": 200
     }
   ],
