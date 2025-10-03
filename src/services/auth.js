@@ -66,13 +66,18 @@ export const getCurrentUser = async () => {
         const newUserData = {
           id: user.id,
           email: user.email,
+          // Required fields from schema
+          password_hash: 'external_auth', // Placeholder since auth is handled by Supabase Auth
+          name: user.email.split('@')[0] || 'User', // Generate a basic name from email
+          role: 'user', // Default role
+          is_active: true,
           created_at: new Date().toISOString(),
-          updated_at: new Date().toISOString(),
-          role: 'user' // Add a default role
+          updated_at: new Date().toISOString()
         };
 
         console.log('Creating user with data:', newUserData);
         
+        // Try to create user using direct insert first
         const { data: newUser, error: createError } = await supabase
           .from('users')
           .insert(newUserData)
@@ -80,19 +85,26 @@ export const getCurrentUser = async () => {
           .single();
 
         if (createError) {
-          console.error('Error creating user profile:', createError);
-          console.error('Error details:', {
-            message: createError.message,
-            details: createError.details,
-            hint: createError.hint,
-            code: createError.code
+          console.error('Error creating user profile with direct insert:', createError);
+          
+          // Fallback to RPC if direct insert fails
+          console.log('Trying RPC method for user creation...');
+          const { data: rpcResult, error: rpcError } = await supabase.rpc('create_user_profile', {
+            p_user_id: newUserData.id,
+            p_email: newUserData.email,
+            p_name: newUserData.name,
+            p_role: newUserData.role
           });
-          // Continue with just the auth data
-          return userData;
-        }
-
-        if (newUser) {
-          console.log('Successfully created user profile:', newUser);
+          
+          if (rpcError) {
+            console.error('RPC method also failed:', rpcError);
+            throw rpcError;
+          }
+          
+          console.log('User profile created via RPC:', rpcResult);
+          userData = { ...userData, ...rpcResult.data };
+        } else if (newUser) {
+          console.log('Successfully created user profile with direct insert:', newUser);
           userData = { ...userData, ...newUser };
         }
       }
