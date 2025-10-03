@@ -25,12 +25,40 @@ export const isAuthenticated = async () => {
 };
 
 export const getCurrentUser = async () => {
-  const { data: { user }, error } = await supabase.auth.getUser();
-  if (error) {
-    console.error('Error getting user:', error);
+  try {
+    // First, get the current session
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    
+    if (sessionError || !session) {
+      console.error('No active session:', sessionError);
+      return null;
+    }
+
+    // Then get the user data
+    const { data: { user }, error: userError } = await supabase.auth.getUser(session.access_token);
+    
+    if (userError || !user) {
+      console.error('Error getting user:', userError);
+      return null;
+    }
+
+    // Get additional user data from your users table
+    const { data: userData, error: userDataError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (userDataError) {
+      console.error('Error fetching user data:', userDataError);
+      return { ...user };
+    }
+
+    return { ...user, ...userData };
+  } catch (error) {
+    console.error('Error in getCurrentUser:', error);
     return null;
   }
-  return user;
 };
 
 export const hasRole = async (role) => {
