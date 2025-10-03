@@ -53,32 +53,52 @@ export const getCurrentUser = async () => {
         .eq('id', user.id)
         .maybeSingle();
 
-      if (!profileError && userProfile) {
+      if (profileError) {
+        console.error('Error fetching user profile:', profileError);
+      }
+
+      if (userProfile) {
         // If we have additional user data, merge it with auth data
         userData = { ...userData, ...userProfile };
       } else {
         // If no user data found, create a basic profile
         console.log('No user profile found, creating one...');
+        const newUserData = {
+          id: user.id,
+          email: user.email,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          role: 'user' // Add a default role
+        };
+
+        console.log('Creating user with data:', newUserData);
+        
         const { data: newUser, error: createError } = await supabase
           .from('users')
-          .insert([
-            {
-              id: user.id,
-              email: user.email,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            }
-          ])
+          .insert(newUserData)
           .select()
           .single();
 
-        if (!createError && newUser) {
+        if (createError) {
+          console.error('Error creating user profile:', createError);
+          console.error('Error details:', {
+            message: createError.message,
+            details: createError.details,
+            hint: createError.hint,
+            code: createError.code
+          });
+          // Continue with just the auth data
+          return userData;
+        }
+
+        if (newUser) {
+          console.log('Successfully created user profile:', newUser);
           userData = { ...userData, ...newUser };
         }
       }
     } catch (error) {
-      console.error('Error in user profile handling:', error);
-      // Continue with just the auth data if there's an error
+      console.error('Unexpected error in user profile handling:', error);
+      // Continue with just the auth data
     }
 
     return userData;
