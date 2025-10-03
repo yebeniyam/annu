@@ -197,46 +197,46 @@ const DashboardPage = () => {
       <Grid container spacing={3} sx={{ mt: 2 }}>
         {/* Revenue Card */}
         <Grid item xs={12} sm={6} md={3}>
-          {renderMetricCard(
-            'TOTAL REVENUE',
-            dashboardData.revenue.current,
-            dashboardData.revenue.change,
-            <RevenueIcon />,
-            theme.palette.primary.main
-          )}
+          <MetricCard
+            title="TOTAL REVENUE"
+            value={dashboardData.revenue.current}
+            change={dashboardData.revenue.change}
+            icon={<RevenueIcon />}
+            color={theme.palette.primary.main}
+          />
         </Grid>
 
         {/* Food Cost Card */}
         <Grid item xs={12} sm={6} md={3}>
-          {renderMetricCard(
-            'FOOD COST %',
-            dashboardData.foodCost.current,
-            dashboardData.foodCost.change,
-            <FoodIcon />,
-            theme.palette.secondary.main
-          )}
+          <MetricCard
+            title="FOOD COST %"
+            value={dashboardData.foodCost.current}
+            change={dashboardData.foodCost.change}
+            icon={<FoodIcon />}
+            color={theme.palette.error.main}
+          />
         </Grid>
 
         {/* Bar Cost Card */}
         <Grid item xs={12} sm={6} md={3}>
-          {renderMetricCard(
-            'BAR COST %',
-            dashboardData.barCost.current,
-            dashboardData.barCost.change,
-            <BarIcon />,
-            theme.palette.info.main
-          )}
+          <MetricCard
+            title="BAR COST %"
+            value={dashboardData.barCost.current}
+            change={dashboardData.barCost.change}
+            icon={<BarIcon />}
+            color={theme.palette.warning.main}
+          />
         </Grid>
 
         {/* Beverage Cost Card */}
         <Grid item xs={12} sm={6} md={3}>
-          {renderMetricCard(
-            'BEVERAGE COST %',
-            dashboardData.beverageCost.current,
-            dashboardData.beverageCost.change,
-            <BeverageIcon />,
-            theme.palette.success.main
-          )}
+          <MetricCard
+            title="BEVERAGE COST %"
+            value={dashboardData.beverageCost.current}
+            change={dashboardData.beverageCost.change}
+            icon={<BeverageIcon />}
+            color={theme.palette.info.main}
+          />
         </Grid>
 
         {/* Sales Chart */}
