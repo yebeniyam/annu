@@ -23,17 +23,21 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 });
 
 // Log auth state changes for debugging
+let authSubscription;
+
 if (typeof window !== 'undefined') {
-  const { data: { subscription } = supabase.auth.onAuthStateChange((event, session) => {
+  const { data } = supabase.auth.onAuthStateChange((event, session) => {
     console.log(`Supabase auth event: ${event}`, session?.user);
   });
   
+  authSubscription = data?.subscription;
+  
   // Cleanup subscription on unmount
-  if (typeof window !== 'undefined') {
-    window.addEventListener('beforeunload', () => {
-      subscription?.unsubscribe();
-    });
-  }
+  window.addEventListener('beforeunload', () => {
+    if (authSubscription) {
+      authSubscription.unsubscribe();
+    }
+  });
 }
 
 export default supabase;
