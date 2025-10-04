@@ -1,42 +1,27 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Get environment variables with fallbacks
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || '';
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || '';
+// Get environment variables
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
 // Validate environment variables
-const validateEnv = () => {
-  const isLocal = process.env.NODE_ENV === 'development';
-  const isMissingVars = !supabaseUrl || !supabaseAnonKey;
+if (!supabaseUrl || !supabaseAnonKey) {
+  console.error('❌ Missing required Supabase environment variables.');
+  console.log('Please check your .env file or deployment environment variables.');
+  console.log('Required variables:');
+  console.log('- REACT_APP_SUPABASE_URL');
+  console.log('- REACT_APP_SUPABASE_ANON_KEY');
   
-  if (isMissingVars) {
-    const message = 'Missing required Supabase environment variables. ' + 
-      (isLocal 
-        ? 'Please check your .env file.' 
-        : 'Please configure them in your deployment environment.');
-    
-    console.error('\n❌', message);
-    console.log('\nRequired environment variables:');
-    console.log('- REACT_APP_SUPABASE_URL');
-    console.log('- REACT_APP_SUPABASE_ANON_KEY');
-    
-    if (isLocal) {
-      console.log('\nCreate a .env file in the root directory with these variables.');
-    } else {
-      console.log('\nPlease set these variables in your deployment environment.');
-    }
-    
-    return false;
+  // In development, show more detailed error
+  if (process.env.NODE_ENV === 'development') {
+    console.log('\nCurrent environment:');
+    console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+    console.log(`REACT_APP_SUPABASE_URL: ${process.env.REACT_APP_SUPABASE_URL ? 'Set' : 'Not set'}`);
+    console.log(`REACT_APP_SUPABASE_ANON_KEY: ${process.env.REACT_APP_SUPABASE_ANON_KEY ? 'Set' : 'Not set'}`);
   }
-  
-  return true;
-};
-
-// Only validate in browser environment
-if (typeof window !== 'undefined') {
-  validateEnv();
 }
 
+// Initialize Supabase client
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,
@@ -59,30 +44,35 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   }
 });
 
-// Initialize auth state
+// Initialize auth state when in browser
 const initializeAuth = async () => {
   if (typeof window === 'undefined') return;
-
+  
   try {
-    // Get the current session
     const { data: { session } } = await supabase.auth.getSession();
-    console.log('Initial session:', session);
-
-    // Set up auth state change listener
+    
+    // Set initial auth state
+    if (session) {
+      console.log('User session found:', session.user?.email);
+    } else {
+      console.log('No active session found');
+    }
+    
+    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        console.log(`Auth state changed: ${event}`, session?.user);
-        
-        // Handle specific auth events
-        if (event === 'SIGNED_OUT') {
-          window.localStorage.removeItem('supabase.auth.token');
+        console.log(`Auth state changed: ${event}`);
+        if (event === 'SIGNED_IN') {
+          console.log('User signed in:', session?.user?.email);
+        } else if (event === 'SIGNED_OUT') {
+          console.log('User signed out');
         }
       }
     );
-
-    // Cleanup on unmount
+    
+    // Cleanup subscription on unmount
     return () => {
-      if (subscription) {
+      if (subscription?.unsubscribe) {
         subscription.unsubscribe();
       }
     };
@@ -95,5 +85,3 @@ const initializeAuth = async () => {
 if (typeof window !== 'undefined') {
   initializeAuth();
 }
-
-export default supabase;
