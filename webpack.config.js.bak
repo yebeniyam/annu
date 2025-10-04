@@ -1,0 +1,164 @@
+const HtmlWebpackPlugin = require('html-webpack-plugin');
+const path = require('path');
+const webpack = require('webpack');
+
+module.exports = (env, argv) => {
+  const isProduction = argv.mode === 'production';
+  
+  return {
+    target: 'web',
+    resolve: {
+      extensions: ['.js', '.jsx'],
+      fallback: {
+        'process/browser': require.resolve('process/browser'),
+        'stream': require.resolve('stream-browserify'),
+        'util': require.resolve('util/'),
+        'buffer': require.resolve('buffer/'),
+        'crypto': require.resolve('crypto-browserify'),
+        'http': require.resolve('stream-http'),
+        'https': require.resolve('https-browserify'),
+        'os': require.resolve('os-browserify/browser'),
+        'url': require.resolve('url/')
+      },
+      alias: {
+        '@mui/material': path.resolve(__dirname, 'node_modules/@mui/material'),
+        '@mui/x-data-grid': path.resolve(__dirname, 'node_modules/@mui/x-data-grid'),
+        '@emotion/react': path.resolve(__dirname, 'node_modules/@emotion/react'),
+        '@emotion/styled': path.resolve(__dirname, 'node_modules/@emotion/styled'),
+        '@babel/runtime': path.resolve(__dirname, 'node_modules/@babel/runtime'),
+        '@components': path.resolve(__dirname, 'src/components/'),
+        '@services': path.resolve(__dirname, 'src/services/'),
+        '@utils': path.resolve(__dirname, 'src/utils/')
+      },
+      fullySpecified: false
+    },
+    entry: './src/index.js',
+    output: {
+      path: path.resolve(__dirname, 'dist'),
+      filename: 'bundle.js',
+      publicPath: '/',
+      clean: true
+    },
+    devServer: {
+      static: {
+        directory: path.join(__dirname, 'public'),
+      },
+      compress: true,
+      port: 3002,
+      hot: true,
+      open: true,
+      historyApiFallback: true,
+      client: {
+        overlay: {
+          errors: true,
+          warnings: false,
+        },
+        logging: 'error',
+        progress: true,
+      },
+      proxy: {
+        '/api': 'http://localhost:5000',
+        '/auth': 'http://localhost:5000'
+      },
+      watchFiles: ['src/**/*'],
+      static: {
+        directory: path.join(__dirname, 'public'),
+      },
+      historyApiFallback: true,
+    },
+    module: {
+      rules: [
+        {
+          test: /\.(js|jsx|mjs)$/,
+          include: [
+            path.resolve(__dirname, 'src'),
+            path.resolve(__dirname, 'node_modules/@mui'),
+            path.resolve(__dirname, 'node_modules/@emotion'),
+            path.resolve(__dirname, 'node_modules/@babel/runtime')
+          ],
+          use: {
+            loader: 'babel-loader',
+            options: {
+              presets: [
+                ['@babel/preset-env', {
+                  modules: 'auto',
+                  useBuiltIns: 'usage',
+                  corejs: 3,
+                  targets: '> 0.25%, not dead'
+                }],
+                '@babel/preset-react'
+              ],
+              plugins: [
+                ['@babel/plugin-transform-runtime', {
+                  regenerator: true
+                }],
+                ['@babel/plugin-transform-modules-commonjs', {
+                  strictMode: false
+                }]
+              ]
+            }
+          }
+        },
+        {
+          test: /\.css$/,
+          use: ['style-loader', 'css-loader']
+        },
+        {
+          test: /\.(png|jpe?g|gif|svg|eot|ttf|woff|woff2)$/i,
+          type: 'asset/resource'
+        }
+      ]
+    },
+    plugins: [
+      new HtmlWebpackPlugin({
+        template: './public/index.html',
+        filename: 'index.html',
+        inject: 'body',
+        favicon: './public/favicon.ico',
+        minify: isProduction ? {
+          removeComments: true,
+          collapseWhitespace: true,
+          removeRedundantAttributes: true,
+          useShortDoctype: true,
+          removeEmptyAttributes: true,
+          removeStyleLinkTypeAttributes: true,
+          keepClosingSlash: true,
+          minifyJS: true,
+          minifyCSS: true,
+          minifyURLs: true
+        } : undefined
+      }),
+      new webpack.ProvidePlugin({
+        process: 'process/browser',
+        Buffer: ['buffer', 'Buffer']
+      }),
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify(isProduction ? 'production' : 'development'),
+          REACT_APP_SUPABASE_URL: JSON.stringify(process.env.REACT_APP_SUPABASE_URL || ''),
+          REACT_APP_SUPABASE_ANON_KEY: JSON.stringify(process.env.REACT_APP_SUPABASE_ANON_KEY || ''),
+          REACT_APP_API_URL: JSON.stringify(process.env.REACT_APP_API_URL || 'http://localhost:5000')
+        }
+      })
+    ],
+    optimization: {
+      minimize: isProduction,
+      splitChunks: {
+        chunks: 'all',
+        cacheGroups: {
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendors',
+            chunks: 'all',
+          },
+        },
+      },
+    },
+    performance: {
+      hints: isProduction ? 'warning' : false,
+      maxEntrypointSize: 512000,
+      maxAssetSize: 512000
+    },
+    devtool: isProduction ? 'source-map' : 'eval-source-map'
+  };
+};

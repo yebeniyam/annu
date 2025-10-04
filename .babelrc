@@ -1,16 +1,33 @@
 {
   "presets": [
     ["@babel/preset-env", {
-      "modules": "commonjs"
+      "modules": false,
+      "useBuiltIns": "usage",
+      "corejs": 3,
+      "targets": "> 0.25%, not dead, not ie 11"
     }],
-    "@babel/preset-react"
+    ["@babel/preset-react", {
+      "runtime": "automatic"
+    }]
   ],
   "plugins": [
-    ["@babel/plugin-transform-modules-commonjs", {
-      "strictMode": false
-    }],
     ["@babel/plugin-transform-runtime", {
-      "regenerator": true
+      "regenerator": true,
+      "corejs": 3
+    }],
+    ["@babel/plugin-proposal-class-properties", { "loose": true }],
+    ["@babel/plugin-proposal-private-methods", { "loose": true }],
+    ["@babel/plugin-proposal-private-property-in-object", { "loose": true }],
+    ["@babel/plugin-transform-modules-commonjs", {
+      "strictMode": false,
+      "allowTopLevelThis": true
     }]
-  ]
+  ],
+  "env": {
+    "production": {
+      "plugins": [
+        ["transform-remove-console", { "exclude": ["error", "warn"] }]
+      ]
+    }
+  }
 }
