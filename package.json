@@ -21,6 +21,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^5.18.0",
     "@mui/material": "^5.18.0",
+    "@mui/x-data-grid": "^8.13.1",
     "@netlify/plugin-nextjs": "^4.39.3",
     "@supabase/auth-helpers-nextjs": "^0.8.7",
     "@supabase/auth-helpers-react": "^0.5.0",
