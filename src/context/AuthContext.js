@@ -12,6 +12,7 @@ export const AuthContext = createContext({
 
 export const AuthProvider = ({ children }) => {
   const [authState, setAuthState] = useState({
+    isAuthenticated: false,
     user: null,
     loading: true,
   });
@@ -39,7 +40,6 @@ export const AuthProvider = ({ children }) => {
 
   // Auto-login for development
   useEffect(() => {
-    // Always auto-login for now, regardless of environment
     const testUser = {
       id: 'test-user-123',
       email: 'test@example.com',
@@ -59,8 +59,12 @@ export const AuthProvider = ({ children }) => {
 
   // Check initial session on mount
   useEffect(() => {
-{{ ... }}
-      await updateAuthState();
+    const initializeAuth = async () => {
+      try {
+        await updateAuthState();
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+      }
     };
     initializeAuth();
   }, [updateAuthState]);
@@ -85,7 +89,6 @@ export const AuthProvider = ({ children }) => {
     try {
       setAuthState(prev => ({ ...prev, loading: true }));
       
-      // First, try to sign in with Supabase
       const { data, error } = await supabase.auth.signInWithPassword({
         email: email.trim(),
         password: password.trim(),
@@ -100,7 +103,6 @@ export const AuthProvider = ({ children }) => {
         throw new Error('No user data returned from authentication');
       }
 
-      // Update auth state with the new user
       const user = await updateAuthState();
       
       if (!user) {
@@ -115,7 +117,6 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error('Login process error:', error);
       
-      // Reset auth state on error
       setAuthState({
         isAuthenticated: false,
         user: null,
@@ -141,10 +142,14 @@ export const AuthProvider = ({ children }) => {
         loading: false,
       });
       
-      // Clear any remaining auth data
-      window.localStorage.removeItem('supabase.auth.token');
+      return { success: true };
     } catch (error) {
       console.error('Logout error:', error);
+      setAuthState(prev => ({ ...prev, loading: false }));
+      return { 
+        success: false, 
+        error: error.message || 'An error occurred during logout.' 
+      };
     }
   };
 
@@ -156,7 +161,7 @@ export const AuthProvider = ({ children }) => {
         logout,
       }}
     >
-      {!authState.loading && children}
+      {authState.loading ? null : children}
     </AuthContext.Provider>
   );
 };
