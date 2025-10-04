@@ -1,10 +1,40 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+// Get environment variables with fallbacks
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || '';
 
-if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables. Please check your .env file.');
+// Validate environment variables
+const validateEnv = () => {
+  const isLocal = process.env.NODE_ENV === 'development';
+  const isMissingVars = !supabaseUrl || !supabaseAnonKey;
+  
+  if (isMissingVars) {
+    const message = 'Missing required Supabase environment variables. ' + 
+      (isLocal 
+        ? 'Please check your .env file.' 
+        : 'Please configure them in your deployment environment.');
+    
+    console.error('\n❌', message);
+    console.log('\nRequired environment variables:');
+    console.log('- REACT_APP_SUPABASE_URL');
+    console.log('- REACT_APP_SUPABASE_ANON_KEY');
+    
+    if (isLocal) {
+      console.log('\nCreate a .env file in the root directory with these variables.');
+    } else {
+      console.log('\nPlease set these variables in your deployment environment.');
+    }
+    
+    return false;
+  }
+  
+  return true;
+};
+
+// Only validate in browser environment
+if (typeof window !== 'undefined') {
+  validateEnv();
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {

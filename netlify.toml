@@ -6,6 +6,14 @@
 [build.environment]
   NODE_VERSION = "18"
   NPM_FLAGS = "--legacy-peer-deps"
+  
+  # Supabase
+  REACT_APP_SUPABASE_URL = "${REACT_APP_SUPABASE_URL}"
+  REACT_APP_SUPABASE_ANON_KEY = "${REACT_APP_SUPABASE_ANON_KEY}"
+  
+  # Auth
+  NEXTAUTH_URL = "${URL}"
+  NEXTAUTH_SECRET = "${NEXTAUTH_SECRET}"
 
 [[redirects]]
   from = "/*"
