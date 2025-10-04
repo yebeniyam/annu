@@ -13,9 +13,19 @@ module.exports = (env, argv) => {
         'process/browser': require.resolve('process/browser'),
         'stream': require.resolve('stream-browserify'),
         'util': require.resolve('util/'),
-        'buffer': require.resolve('buffer/')
+        'buffer': require.resolve('buffer/'),
+        'crypto': require.resolve('crypto-browserify'),
+        'http': require.resolve('stream-http'),
+        'https': require.resolve('https-browserify'),
+        'os': require.resolve('os-browserify/browser'),
+        'url': require.resolve('url/')
       },
       alias: {
+        '@mui/material': path.resolve(__dirname, 'node_modules/@mui/material'),
+        '@mui/x-data-grid': path.resolve(__dirname, 'node_modules/@mui/x-data-grid'),
+        '@emotion/react': path.resolve(__dirname, 'node_modules/@emotion/react'),
+        '@emotion/styled': path.resolve(__dirname, 'node_modules/@emotion/styled'),
+        '@babel/runtime': path.resolve(__dirname, 'node_modules/@babel/runtime'),
         '@components': path.resolve(__dirname, 'src/components/'),
         '@services': path.resolve(__dirname, 'src/services/'),
         '@utils': path.resolve(__dirname, 'src/utils/')
@@ -81,11 +91,19 @@ module.exports = (env, argv) => {
       rules: [
         {
           test: /\.(js|jsx)$/,
-          exclude: /node_modules/,
+          exclude: /node_modules\/(?!(\@mui\/x-data-grid|\@mui\/material|\@emotion\/.*|\@babel\/runtime\/helpers\/esm|\@mui\/utils|\@mui\/core|\@mui\/icons-material|\@mui\/material\/styles|\@mui\/material\/colors|\@mui\/material\/Box|\@mui\/material\/Button|\@mui\/material\/TextField|\@mui\/material\/Paper|\@mui\/material\/Typography|\@mui\/material\/Grid|\@mui\/material\/Card|\@mui\/material\/CardContent|\@mui\/material\/CardHeader|\@mui\/material\/Divider|\@mui\/material\/CircularProgress|\@mui\/material\/Alert|\@mui\/material\/IconButton|\@mui\/material\/Menu|\@mui\/material\/MenuItem|\@mui\/material\/ListItemIcon|\@mui\/material\/ListItemText|\@mui\/material\/ToggleButtonGroup|\@mui\/material\/ToggleButton|\@mui\/material\/Tooltip|\@mui\/material\/Chip))/,
           use: {
             loader: 'babel-loader',
             options: {
-              presets: ['@babel/preset-env', '@babel/preset-react']
+              presets: ['@babel/preset-env', '@babel/preset-react'],
+              plugins: [
+                ['@babel/plugin-transform-runtime', {
+                  'regenerator': true
+                }],
+                ['@babel/plugin-transform-modules-commonjs', {
+                  'strictMode': false
+                }]
+              ]
             }
           }
         },
