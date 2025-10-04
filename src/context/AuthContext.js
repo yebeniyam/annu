@@ -65,23 +65,47 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       setAuthState(prev => ({ ...prev, loading: true }));
+      
+      // First, try to sign in with Supabase
       const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+        email: email.trim(),
+        password: password.trim(),
       });
 
-      if (error) throw error;
-
-      const user = await updateAuthState();
-      return { success: true, user };
-    } catch (error) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.error('Login error:', error);
+      if (error) {
+        console.error('Supabase auth error:', error);
+        throw new Error(error.message || 'Invalid email or password');
       }
-      setAuthState(prev => ({ ...prev, loading: false }));
+
+      if (!data || !data.user) {
+        throw new Error('No user data returned from authentication');
+      }
+
+      // Update auth state with the new user
+      const user = await updateAuthState();
+      
+      if (!user) {
+        throw new Error('Failed to load user data');
+      }
+
+      return { 
+        success: true, 
+        user 
+      };
+      
+    } catch (error) {
+      console.error('Login process error:', error);
+      
+      // Reset auth state on error
+      setAuthState({
+        isAuthenticated: false,
+        user: null,
+        loading: false,
+      });
+      
       return { 
         success: false, 
-        error: error.message || 'An error occurred during login' 
+        error: error.message || 'An error occurred during login. Please try again.' 
       };
     }
   };

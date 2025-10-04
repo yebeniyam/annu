@@ -6,7 +6,7 @@ import LoginForm from '../components/auth/LoginForm';
 
 const LoginPage = () => {
   const location = useLocation();
-  const from = location.state?.from?.pathname || '/dashboard';
+  const from = location.state?.from?.pathname || '/';
 
   return (
     <Container component="main" maxWidth="xs">

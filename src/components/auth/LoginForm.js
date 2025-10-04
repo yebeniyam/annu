@@ -43,10 +43,19 @@ const LoginForm = () => {
     onSubmit: async (values, { setSubmitting, setFieldError }) => {
       try {
         setError(null);
-        await login(values.email, values.password);
-        navigate('/dashboard');
+        const result = await login(values.email, values.password);
+        
+        if (result.success) {
+          // If login is successful, navigate to the intended URL or home
+          const redirectTo = location.state?.from?.pathname || '/';
+          navigate(redirectTo);
+        } else {
+          setError(result.error || 'Invalid email or password');
+          setFieldError('password', ' '); // Clear password field
+        }
       } catch (err) {
-        setError('Invalid email or password');
+        console.error('Login error:', err);
+        setError(err.message || 'An error occurred during login');
         setFieldError('password', ' '); // Clear password field
       } finally {
         setSubmitting(false);
