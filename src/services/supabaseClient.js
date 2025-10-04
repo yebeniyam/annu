@@ -1,14 +1,12 @@
 import { createClient } from '@supabase/supabase-js';
 
-// Initialize the Supabase client with proper configuration
 const supabaseUrl = process.env.REACT_APP_SUPABASE_URL;
 const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase environment variables are not set. Please set REACT_APP_SUPABASE_URL and REACT_APP_SUPABASE_ANON_KEY.');
+  console.error('Missing Supabase environment variables. Please check your .env file.');
 }
 
-// Create a single supabase client for interacting with your database
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     persistSession: true,

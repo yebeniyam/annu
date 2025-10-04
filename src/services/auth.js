@@ -1,32 +1,54 @@
 import { supabase } from './supabaseClient';
 
+// Get current session token
 export const getAuthToken = async () => {
-  const { data: { session } } = await supabase.auth.getSession();
-  return session?.access_token || null;
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    return session?.access_token || null;
+  } catch (error) {
+    console.error('Error getting auth token:', error);
+    return null;
+  }
 };
 
+// For compatibility with existing code
 export const setAuthToken = (token) => {
-  // In Supabase, the token is managed automatically
-  // This function is kept for compatibility
   console.warn('Supabase manages tokens automatically. No manual token setting required.');
 };
 
+// Sign out user
 export const removeAuthToken = async () => {
-  await supabase.auth.signOut();
+  try {
+    const { error } = await supabase.auth.signOut();
+    if (error) throw error;
+    // Clear any remaining auth data
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem('sb-access-token');
+      window.localStorage.removeItem('sb-refresh-token');
+    }
+  } catch (error) {
+    console.error('Error signing out:', error);
+    throw error;
+  }
 };
 
+// Check if user is authenticated
 export const isAuthenticated = async () => {
-  const { data: { session }, error } = await supabase.auth.getSession();
-  if (error) {
-    console.error('Error getting session:', error);
+  try {
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) throw error;
+    return !!session?.user;
+  } catch (error) {
+    console.error('Error checking authentication:', error);
     return false;
   }
-  return !!session;
 };
 
+// Get current user with extended profile data
 export const getCurrentUser = async () => {
   try {
-    // First, get the current session
+    // First get the current session
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     
     if (sessionError || !session) {
@@ -120,9 +142,23 @@ export const getCurrentUser = async () => {
   }
 };
 
+// Sign in with email and password
+export const signInWithEmail = async (email, password) => {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) throw error;
+    return { user: data.user, error: null };
+  } catch (error) {
+    console.error('Error signing in:', error);
+    return { user: null, error };
+  }
+};
+
 export const hasRole = async (role) => {
   const user = await getCurrentUser();
-  // In Supabase, we need to get user role from a custom user table
   if (!user) return false;
   
   // Get user role from our users table
@@ -154,6 +190,10 @@ export const hasAnyRole = async (roles = []) => {
   if (error) {
     console.error('Error getting user role:', error);
     return false;
+  }
+  
+  return data && roles.includes(data.role);
+};
   }
   
   return data && roles.includes(data.role);
