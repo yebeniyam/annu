@@ -194,7 +194,3 @@ export const hasAnyRole = async (roles = []) => {
   
   return data && roles.includes(data.role);
 };
-  }
-  
-  return data && roles.includes(data.role);
-};
