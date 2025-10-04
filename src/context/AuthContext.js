@@ -12,7 +12,6 @@ export const AuthContext = createContext({
 
 export const AuthProvider = ({ children }) => {
   const [authState, setAuthState] = useState({
-    isAuthenticated: false,
     user: null,
     loading: true,
   });
@@ -38,9 +37,29 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
+  // Auto-login for development
+  useEffect(() => {
+    // Always auto-login for now, regardless of environment
+    const testUser = {
+      id: 'test-user-123',
+      email: 'test@example.com',
+      name: 'Test User',
+      role: 'admin',
+      is_active: true,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    setAuthState({
+      isAuthenticated: true,
+      user: testUser,
+      loading: false,
+    });
+  }, []);
+
   // Check initial session on mount
   useEffect(() => {
-    const initializeAuth = async () => {
+{{ ... }}
       await updateAuthState();
     };
     initializeAuth();

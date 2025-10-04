@@ -1,60 +1,41 @@
 import React from 'react';
-import { Navigate, Outlet, useLocation } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { Outlet, useLocation } from 'react-router-dom';
 import PropTypes from 'prop-types';
-import { Box, CircularProgress, Typography } from '@mui/material';
 
 /**
- * A component that renders children only if the user is authenticated.
- * If not authenticated, redirects to the login page.
- * Optionally checks for required roles.
+ * A component that renders its children without authentication.
+ * This is a simplified version that bypasses all auth checks.
  */
-const PrivateRoute = ({ roles = [], redirectTo = '/login', children }) => {
-  const { isAuthenticated, user, loading } = useAuth();
+const PrivateRoute = ({ children, roles = [] }) => {
   const location = useLocation();
+  
+  // Mock user with admin role for development
+  const mockUser = {
+    id: 'test-user-123',
+    email: 'test@example.com',
+    name: 'Test User',
+    role: 'admin',
+    is_active: true,
+  };
 
-  // Show loading state while checking authentication
-  if (loading) {
-    return (
-      <Box 
-        display="flex" 
-        flexDirection="column" 
-        justifyContent="center" 
-        alignItems="center" 
-        minHeight="100vh"
-      >
-        <CircularProgress size={60} thickness={4} />
-        <Typography variant="h6" mt={2}>Authenticating...</Typography>
-      </Box>
-    );
+  // Check if user has required role (if any roles are specified)
+  const hasRequiredRole = roles.length === 0 || roles.includes(mockUser.role);
+  
+  if (!hasRequiredRole) {
+    return <div>You don't have permission to access this page.</div>;
   }
 
-  // If not authenticated, redirect to login with return URL
-  if (!isAuthenticated) {
-    return <Navigate to={redirectTo} state={{ from: location }} replace />;
-  }
-
-  // Check if user has required role if roles are specified
-  if (roles.length > 0 && !roles.some(role => user?.role === role)) {
-    console.warn(`User with role ${user?.role} attempted to access route requiring roles:`, roles);
-    return <Navigate to="/unauthorized" state={{ from: location }} replace />;
-  }
-
-  // If authenticated and has required role, render children or outlet
+  // Always allow access and render children
   return children || <Outlet />;
 };
 
 PrivateRoute.propTypes = {
   /**
-   * Array of allowed roles. If empty, any authenticated user can access.
+   * Array of allowed roles. If empty, any user can access.
    */
   roles: PropTypes.arrayOf(PropTypes.string),
   /**
-   * Path to redirect to if not authenticated.
-   */
-  redirectTo: PropTypes.string,
-  /**
-   * Child elements to render if authenticated.
+   * Child elements to render.
    */
   children: PropTypes.node,
 };

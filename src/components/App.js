@@ -25,18 +25,16 @@ const App = () => {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* Public Routes */}
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-            <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
-            <Route path="/verify-email" element={<EmailVerificationPage />} />
+            {/* Public Routes - Redirect to dashboard */}
+            <Route path="/login" element={<Navigate to="/" replace />} />
+            <Route path="/register" element={<Navigate to="/" replace />} />
+            <Route path="/forgot-password" element={<Navigate to="/" replace />} />
+            <Route path="/reset-password/:token" element={<Navigate to="/" replace />} />
+            <Route path="/verify-email" element={<Navigate to="/" replace />} />
             
-            {/* Protected Routes */}
+            {/* Protected Routes - Main App */}
             <Route element={
-              <PrivateRoute>
-                <MainLayout />
-              </PrivateRoute>
+              <MainLayout />
             }>
               <Route index element={<DashboardPage />} />
               <Route path="inventory/*" element={<InventoryPage />} />
