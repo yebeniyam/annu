@@ -52,7 +52,9 @@ export const getCurrentUser = async () => {
     const { data: { session }, error: sessionError } = await supabase.auth.getSession();
     
     if (sessionError || !session) {
-      console.log('No active session:', sessionError?.message || 'No session found');
+      if (process.env.NODE_ENV !== 'production') {
+        console.debug('No active session:', sessionError?.message || 'No session found');
+      }
       return null;
     }
 
@@ -137,7 +139,9 @@ export const getCurrentUser = async () => {
 
     return userData;
   } catch (error) {
-    console.error('Error in getCurrentUser:', error);
+    if (process.env.NODE_ENV !== 'production') {
+      console.error('Error in getCurrentUser:', error);
+    }
     return null;
   }
 };
